@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI Resume Analyzer — Get your ATS score, skill match insights, and AI-powered resume suggestions.">
+  <title>AI Resume Analyzer — Analyze Your Resume with AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css">
+</head>
+<body>
+
+  <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+  <nav class="navbar navbar-expand-lg navbar-premium fixed-top" aria-label="Main navigation">
+    <div class="container">
+      <a class="navbar-brand-premium" th:href="@{/}" href="/">
+        <span class="brand-icon" aria-hidden="true"><i class="bi bi-file-earmark-person-fill"></i></span>
+        <span>AI Resume Analyzer</span>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarMain">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+          <li class="nav-item"><a class="nav-link nav-link-premium active" th:href="@{/}" href="/" aria-current="page">Home</a></li>
+          <li class="nav-item"><a class="nav-link nav-link-premium" href="#features">Features</a></li>
+          <li class="nav-item"><a class="nav-link nav-link-premium" href="#stats">Statistics</a></li>
+          <li class="nav-item ms-lg-2">
+            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+              <i class="bi bi-sun-fill icon-sun" aria-hidden="true"></i>
+              <i class="bi bi-moon-fill icon-moon" aria-hidden="true"></i>
+            </button>
+          </li>
+          <li class="nav-item ms-lg-1">
+            <a class="btn btn-nav-cta" th:href="@{/analyze}" href="/analyze">
+              <i class="bi bi-lightning-charge-fill me-1" aria-hidden="true"></i> Analyze Resume
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main id="mainContent">
+    <section class="hero-section">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <div class="hero-badge">
+              <span class="pulse-dot" aria-hidden="true"></span>
+              Powered by Advanced AI Technology
+            </div>
+            <h1 class="hero-title">Analyze Your Resume with <span class="text-gradient">AI</span></h1>
+            <p class="hero-subtitle">
+              Get instant ATS compatibility scores, skill gap analysis, and personalized AI insights
+              to optimize your resume and land more interviews.
+            </p>
+            <div class="hero-actions">
+              <a th:href="@{/analyze}" href="/analyze" class="btn btn-gradient"><i class="bi bi-cloud-upload me-2" aria-hidden="true"></i>Upload Resume</a>
+              <a th:href="@{/analyze}" href="/analyze" class="btn btn-outline-premium"><i class="bi bi-bar-chart-line me-2" aria-hidden="true"></i>Analyze Resume</a>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="hero-visual">
+              <div class="hero-mockup">
+                <div class="floating-badge top-right"><i class="bi bi-check-circle-fill" aria-hidden="true"></i> ATS Optimized</div>
+                <div class="floating-badge bottom-left"><i class="bi bi-stars" aria-hidden="true"></i> AI Powered</div>
+                <div class="mockup-score">
+                  <div class="text-secondary-custom small fw-semibold text-uppercase mb-2">Your ATS Score</div>
+                  <div class="mockup-score-value">87%</div>
+                  <div class="mockup-bar"><div class="mockup-bar-fill"></div></div>
+                  <div class="d-flex justify-content-center gap-3 mt-3 flex-wrap">
+                    <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2"><i class="bi bi-check2 me-1" aria-hidden="true"></i>12 Skills Matched</span>
+                    <span class="badge rounded-pill bg-danger-subtle text-danger px-3 py-2"><i class="bi bi-x me-1" aria-hidden="true"></i>6 Missing</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-section" id="stats" aria-label="Platform statistics">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-sm-6 col-lg-3 fade-in-section">
+            <div class="stat-card"><div class="stat-icon"><i class="bi bi-people-fill" aria-hidden="true"></i></div><div class="stat-value"><span data-counter="15000">0</span>+</div><div class="stat-label">Resumes Analyzed</div></div>
+          </div>
+          <div class="col-sm-6 col-lg-3 fade-in-section stagger-1">
+            <div class="stat-card"><div class="stat-icon"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i></div><div class="stat-value"><span data-counter="92">0</span>%</div><div class="stat-label">Average Score Improvement</div></div>
+          </div>
+          <div class="col-sm-6 col-lg-3 fade-in-section stagger-2">
+            <div class="stat-card"><div class="stat-icon"><i class="bi bi-briefcase-fill" aria-hidden="true"></i></div><div class="stat-value"><span data-counter="500">0</span>+</div><div class="stat-label">Job Roles Supported</div></div>
+          </div>
+          <div class="col-sm-6 col-lg-3 fade-in-section stagger-3">
+            <div class="stat-card"><div class="stat-icon"><i class="bi bi-lightning-charge-fill" aria-hidden="true"></i></div><div class="stat-value"><span data-counter="30">0</span>s</div><div class="stat-label">Average Analysis Time</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features-section" id="features" aria-label="Product features">
+      <div class="container">
+        <div class="text-center mb-2">
+          <span class="section-label"><i class="bi bi-stars" aria-hidden="true"></i> Features</span>
+          <h2 class="section-title">Everything You Need to <span class="text-gradient">Stand Out</span></h2>
+          <p class="section-subtitle">Our AI-powered platform provides comprehensive resume analysis to help you beat ATS systems and impress recruiters.</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-4 fade-in-section"><div class="feature-card"><div class="feature-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></div><h3 class="feature-title">ATS Score Analysis</h3><p class="feature-desc">Get a detailed ATS compatibility score with visual breakdowns showing exactly how well your resume performs against applicant tracking systems.</p></div></div>
+          <div class="col-md-6 col-lg-4 fade-in-section stagger-1"><div class="feature-card"><div class="feature-icon"><i class="bi bi-puzzle-fill" aria-hidden="true"></i></div><h3 class="feature-title">Skill Match Detection</h3><p class="feature-desc">Instantly identify matched and missing skills compared to any job description, with actionable recommendations to close skill gaps.</p></div></div>
+          <div class="col-md-6 col-lg-4 fade-in-section stagger-2"><div class="feature-card"><div class="feature-icon"><i class="bi bi-robot" aria-hidden="true"></i></div><h3 class="feature-title">AI-Powered Suggestions</h3><p class="feature-desc">Receive personalized AI recommendations to improve formatting, keyword density, and content quality for maximum impact.</p></div></div>
+          <div class="col-md-6 col-lg-4 fade-in-section stagger-1"><div class="feature-card"><div class="feature-icon"><i class="bi bi-search" aria-hidden="true"></i></div><h3 class="feature-title">Keyword Optimization</h3><p class="feature-desc">Analyze keyword density and discover high-impact terms to include, ensuring your resume ranks higher in automated screenings.</p></div></div>
+          <div class="col-md-6 col-lg-4 fade-in-section stagger-2"><div class="feature-card"><div class="feature-icon"><i class="bi bi-file-earmark-pdf" aria-hidden="true"></i></div><h3 class="feature-title">Multi-Format Support</h3><p class="feature-desc">Upload resumes in PDF or DOCX format with drag-and-drop convenience. Our parser handles complex layouts with precision.</p></div></div>
+          <div class="col-md-6 col-lg-4 fade-in-section stagger-3"><div class="feature-card"><div class="feature-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></div><h3 class="feature-title">Privacy First</h3><p class="feature-desc">Your resume data is processed securely and never shared. Enterprise-grade encryption keeps your personal information safe.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-5">
+      <div class="container">
+        <div class="card-glass text-center p-5 fade-in-section">
+          <h2 class="mb-3">Ready to Optimize Your Resume?</h2>
+          <p class="text-secondary-custom mb-4 mx-auto" style="max-width:480px">Join thousands of job seekers who improved their interview rates with AI-powered resume analysis.</p>
+          <a th:href="@{/analyze}" href="/analyze" class="btn btn-gradient btn-lg"><i class="bi bi-rocket-takeoff me-2" aria-hidden="true"></i>Start Free Analysis</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer-premium">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="footer-brand"><i class="bi bi-file-earmark-person-fill" aria-hidden="true"></i> AI Resume Analyzer</div>
+          <p class="small mb-3">Empowering job seekers with AI-driven resume insights to beat ATS systems and accelerate career growth.</p>
+          <div class="footer-social d-flex gap-2">
+            <a href="https://www.linkedin.com/in/kishorelogan" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+            <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+            <a href="https://github.com/kishoreL1979" aria-label="GitHub"><i class="bi bi-github"></i></a>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="footer-heading">Product</h6>
+          <div class="footer-links">
+            <a th:href="@{/analyze}" href="/analyze">Analyze Resume</a>
+            <a href="#features">Features</a>
+            <a href="#stats">Statistics</a>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="footer-heading">Resources</h6>
+          <div class="footer-links">
+            <a href="#">Documentation</a>
+            <a href="#">ATS Guide</a>
+            <a href="#">Blog</a>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <h6 class="footer-heading">Contact</h6>
+          <div class="footer-contact-item"><i class="bi bi-envelope" aria-hidden="true"></i>lokikishore@gmail.com</div>
+          <div class="footer-contact-item"><i class="bi bi-geo-alt" aria-hidden="true"></i>coimbatore</div>
+          <div class="footer-contact-item"><i class="bi bi-telephone" aria-hidden="true"></i>7530085013</div>
+        </div>
+      </div>
+      <div class="footer-bottom text-center">&copy; 2026 AI Resume Analyzer. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script th:src="@{/js/script.js(v='2.0.2')}" src="/js/script.js?v=2.0.2"></script>
+</body>
+</html>

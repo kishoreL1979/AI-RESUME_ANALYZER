@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Analyze your resume against job descriptions with AI-powered ATS scoring and insights.">
+  <title>Resume Analysis Dashboard — AI Resume Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css">
+</head>
+<body>
+
+  <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-premium fixed-top" aria-label="Main navigation">
+    <div class="container">
+      <a class="navbar-brand-premium" th:href="@{/}" href="/">
+        <span class="brand-icon" aria-hidden="true"><i class="bi bi-file-earmark-person-fill"></i></span>
+        <span>AI Resume Analyzer</span>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarMain">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+          <li class="nav-item"><a class="nav-link nav-link-premium" th:href="@{/}" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link nav-link-premium active" th:href="@{/analyze}" href="/analyze" aria-current="page">Analyze</a></li>
+          <li class="nav-item ms-lg-2">
+            <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+              <i class="bi bi-sun-fill icon-sun" aria-hidden="true"></i>
+              <i class="bi bi-moon-fill icon-moon" aria-hidden="true"></i>
+            </button>
+          </li>
+          <li class="nav-item ms-lg-1">
+            <a class="btn btn-nav-cta" th:href="@{/analyze}" href="/analyze">
+              <i class="bi bi-lightning-charge-fill me-1" aria-hidden="true"></i> New Analysis
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- AI Analysis Loading Overlay -->
+  <div class="analysis-overlay" id="analysisOverlay" role="dialog" aria-modal="true" aria-labelledby="analysisTitle" aria-hidden="true">
+    <div class="analysis-modal">
+      <div class="analysis-modal-header">
+        <div class="analysis-modal-icon" aria-hidden="true"><i class="bi bi-cpu"></i></div>
+        <h2 id="analysisTitle" class="h5 mb-1">AI Analysis in Progress</h2>
+        <p class="text-secondary-custom small mb-0">Our AI is processing your resume</p>
+      </div>
+      <div class="analysis-progress-wrap">
+        <div class="analysis-progress-label">
+          <span id="analysisStepLabel">Starting analysis...</span>
+          <span id="analysisPercent">0%</span>
+        </div>
+        <div class="analysis-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="analysisProgressBar">
+          <div class="analysis-progress-fill" id="analysisProgressFill"></div>
+        </div>
+      </div>
+      <ol class="analysis-steps" id="analysisSteps" aria-label="Analysis steps">
+        <li class="analysis-step" data-step="0"><span class="step-indicator">1</span> Extracting Resume Content</li>
+        <li class="analysis-step" data-step="1"><span class="step-indicator">2</span> Analyzing Skills</li>
+        <li class="analysis-step" data-step="2"><span class="step-indicator">3</span> Calculating ATS Score</li>
+        <li class="analysis-step" data-step="3"><span class="step-indicator">4</span> Matching Job Description</li>
+        <li class="analysis-step" data-step="4"><span class="step-indicator">5</span> Generating AI Insights</li>
+        <li class="analysis-step" data-step="5"><span class="step-indicator">6</span> Preparing Report</li>
+      </ol>
+    </div>
+  </div>
+
+  <main class="analyze-page" id="mainContent" style="padding-top: 5.5rem;">
+    <div class="container">
+
+      <header class="page-header fade-in-section visible">
+        <span class="section-label"><i class="bi bi-grid-1x2" aria-hidden="true"></i> Dashboard</span>
+        <h1 class="page-title">Resume <span class="text-gradient">Analysis</span></h1>
+        <p class="page-subtitle">Upload your resume, paste the job description, and receive enterprise-grade ATS analytics powered by AI.</p>
+      </header>
+
+      <!-- Input Section -->
+      <div class="row g-4 mb-4 section-block no-print">
+        <div class="col-lg-6 fade-in-section visible">
+          <div class="card-premium h-100 lift-hover">
+            <div class="card-header-premium">
+              <i class="bi bi-cloud-upload" aria-hidden="true"></i> Upload Resume
+            </div>
+            <div class="card-body-premium">
+              <form id="uploadForm" th:action="@{/api/analyze}" method="post" enctype="multipart/form-data">
+                <input type="file" id="resumeFile" name="resume" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="d-none" aria-label="Upload resume file">
+                <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Drag and drop resume or click to browse">
+                  <div class="upload-icon"><i class="bi bi-file-earmark-arrow-up" aria-hidden="true"></i></div>
+                  <div class="upload-title">Drag &amp; Drop your resume here</div>
+                  <p class="upload-hint">or click to browse files</p>
+                  <div class="upload-formats">
+                    <span class="format-badge">PDF</span>
+                    <span class="format-badge">DOCX</span>
+                  </div>
+                </div>
+                <div class="file-preview" id="filePreview">
+                  <div class="file-preview-icon"><i class="bi bi-file-earmark-check" aria-hidden="true"></i></div>
+                  <div class="file-preview-info">
+                    <div class="file-preview-name" id="fileName">resume.pdf</div>
+                    <div class="file-preview-size" id="fileSize">0 KB</div>
+                  </div>
+                  <button type="button" class="file-remove-btn" id="removeFile" aria-label="Remove uploaded file">
+                    <i class="bi bi-trash3" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 fade-in-section visible">
+          <div class="card-premium h-100 lift-hover">
+            <div class="card-header-premium">
+              <i class="bi bi-briefcase" aria-hidden="true"></i> Job Description
+            </div>
+            <div class="card-body-premium">
+              <label for="jobDescription" class="visually-hidden">Job description</label>
+              <textarea id="jobDescription" name="jobDescription" class="job-textarea"
+                placeholder="Paste the full job description here...&#10;&#10;Include requirements, responsibilities, and preferred qualifications for the most accurate analysis."
+                rows="10" maxlength="5000" aria-describedby="charCountHelp"></textarea>
+              <div class="char-counter" id="charCountHelp">
+                <span><i class="bi bi-text-paragraph me-1" aria-hidden="true"></i>Character count</span>
+                <span><span id="charCount">0</span> / 5,000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mb-5 fade-in-section visible no-print">
+        <button type="button" id="analyzeBtn" class="btn btn-gradient btn-analyze" aria-live="polite">
+          <span class="btn-text"><i class="bi bi-cpu me-2" aria-hidden="true"></i>Analyze Resume</span>
+          <span class="btn-spinner"><span class="spinner-border-premium"></span></span>
+        </button>
+      </div>
+
+      <!-- Results Dashboard -->
+      <section id="resultsSection" class="results-section" aria-live="polite" aria-label="Analysis results">
+
+        <!-- Export Bar -->
+        <div class="export-bar" id="exportBar">
+          <div class="export-bar-title">
+            <i class="bi bi-check-circle-fill text-success" aria-hidden="true"></i>
+            Analysis Report Ready
+          </div>
+          <div class="export-actions">
+            <button type="button" class="btn-action primary" id="downloadPdfBtn" aria-label="Download PDF report">
+              <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> Download PDF Report
+            </button>
+            <button type="button" class="btn-action" id="downloadSummaryBtn" aria-label="Download analysis summary">
+              <i class="bi bi-file-earmark-text" aria-hidden="true"></i> Download Summary
+            </button>
+            <button type="button" class="btn-action" id="printReportBtn" aria-label="Print report">
+              <i class="bi bi-printer" aria-hidden="true"></i> Print Report
+            </button>
+          </div>
+        </div>
+
+        <!-- Dashboard Widgets (6) -->
+        <div class="row g-3 mb-4 section-block">
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="widget-card" id="widgetAtsScore">
+              <div class="widget-header"><span class="widget-title">ATS Score</span><div class="widget-icon indigo"><i class="bi bi-speedometer2"></i></div></div>
+              <div class="widget-value">0%</div>
+              <div class="widget-meta positive">Above avg</div>
+              <div class="widget-progress"><div class="widget-progress-bar" style="width:0%;background:var(--accent-gradient)"></div></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="widget-card" id="widgetMatchedSkills">
+              <div class="widget-header"><span class="widget-title">Matched Skills</span><div class="widget-icon green"><i class="bi bi-check2-circle"></i></div></div>
+              <div class="widget-value" id="widgetMatchedCount">0</div>
+              <div class="widget-meta positive">Keywords found</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="widget-card" id="widgetMissingSkills">
+              <div class="widget-header"><span class="widget-title">Missing Skills</span><div class="widget-icon red"><i class="bi bi-x-circle"></i></div></div>
+              <div class="widget-value" id="widgetMissingCount">0</div>
+              <div class="widget-meta neutral">Gaps detected</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="widget-card" id="widgetKeywordDensity">
+              <div class="widget-header"><span class="widget-title">Keyword Density</span><div class="widget-icon blue"><i class="bi bi-search"></i></div></div>
+              <div class="widget-value">0%</div>
+              <div class="widget-meta neutral">Coverage</div>
+              <div class="widget-progress"><div class="widget-progress-bar" style="width:0%;background:linear-gradient(90deg,#3b82f6,#60a5fa)"></div></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="widget-card" id="widgetResumeQuality">
+              <div class="widget-header"><span class="widget-title">Resume Quality</span><div class="widget-icon purple"><i class="bi bi-award"></i></div></div>
+              <div class="widget-value">0%</div>
+              <div class="widget-meta positive">Structure</div>
+              <div class="widget-progress"><div class="widget-progress-bar" style="width:0%;background:linear-gradient(90deg,#7c3aed,#8b5cf6)"></div></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="widget-card" id="widgetConfidence">
+              <div class="widget-header"><span class="widget-title">Confidence</span><div class="widget-icon teal"><i class="bi bi-shield-check"></i></div></div>
+              <div class="widget-value">0%</div>
+              <div class="widget-meta positive">AI accuracy</div>
+              <div class="widget-progress"><div class="widget-progress-bar" style="width:0%;background:linear-gradient(90deg,#14b8a6,#2dd4bf)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- ATS Gauge + Analytics Mini -->
+        <div class="row g-4 mb-4 section-block">
+          <div class="col-lg-5">
+            <div class="card-premium h-100 gauge-card">
+              <div class="card-header-premium"><i class="bi bi-bullseye" aria-hidden="true"></i> ATS Compatibility Score</div>
+              <div class="card-body-premium score-section">
+                <div class="score-circle-wrapper">
+                  <svg class="score-circle" viewBox="0 0 180 180" role="img" aria-label="ATS score gauge">
+                    <defs>
+                      <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#4f46e5"/>
+                        <stop offset="50%" style="stop-color:#7c3aed"/>
+                        <stop offset="100%" style="stop-color:#6366f1"/>
+                      </linearGradient>
+                    </defs>
+                    <circle class="score-circle-bg" cx="90" cy="90" r="80"/>
+                    <circle class="score-circle-fill" id="scoreCircleFill" cx="90" cy="90" r="80"/>
+                  </svg>
+                  <div class="score-circle-value">
+                    <span class="score-number good" id="scoreNumber" aria-live="polite">0</span>
+                    <span class="score-label">out of 100</span>
+                  </div>
+                </div>
+                <span class="score-grade good" id="scoreGrade">Analyzing</span>
+                <div class="score-range-legend mt-3">
+                  <span class="range-chip excellent">85+ Excellent</span>
+                  <span class="range-chip good">70+ Good</span>
+                  <span class="range-chip fair">50+ Fair</span>
+                  <span class="range-chip poor">&lt;50 Poor</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-7">
+            <div class="row g-3 h-100">
+              <div class="col-sm-6"><div class="analytics-mini h-100"><div class="analytics-mini-icon"><i class="bi bi-file-text"></i></div><div><div class="analytics-mini-value" id="analyticsFormat">—</div><div class="analytics-mini-label">Formatting</div></div></div></div>
+              <div class="col-sm-6"><div class="analytics-mini h-100"><div class="analytics-mini-icon"><i class="bi bi-key"></i></div><div><div class="analytics-mini-value" id="analyticsKeywords">—</div><div class="analytics-mini-label">Keywords</div></div></div></div>
+              <div class="col-sm-6"><div class="analytics-mini h-100"><div class="analytics-mini-icon"><i class="bi bi-person-workspace"></i></div><div><div class="analytics-mini-value" id="analyticsExperience">—</div><div class="analytics-mini-label">Experience</div></div></div></div>
+              <div class="col-sm-6"><div class="analytics-mini h-100"><div class="analytics-mini-icon"><i class="bi bi-graph-up"></i></div><div><div class="analytics-mini-value" id="analyticsImpact">—</div><div class="analytics-mini-label">Impact Score</div></div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4 section-block">
+          <div class="col-lg-6">
+            <div class="card-premium chart-card h-100">
+              <div class="card-header-premium"><i class="bi bi-pie-chart" aria-hidden="true"></i> Skill Match Distribution</div>
+              <div class="card-body-premium"><div class="chart-container"><canvas id="skillMatchChart" aria-label="Skill match pie chart"></canvas></div></div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card-premium chart-card h-100">
+              <div class="card-header-premium"><i class="bi bi-radar" aria-hidden="true"></i> Resume Category Analysis</div>
+              <div class="card-body-premium"><div class="chart-container"><canvas id="radarChart" aria-label="Resume category radar chart"></canvas></div></div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card-premium chart-card h-100">
+              <div class="card-header-premium"><i class="bi bi-bar-chart" aria-hidden="true"></i> Keyword Coverage</div>
+              <div class="card-body-premium"><div class="chart-container"><canvas id="keywordBarChart" aria-label="Keyword coverage bar chart"></canvas></div></div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card-premium chart-card h-100">
+              <div class="card-header-premium"><i class="bi bi-diagram-3" aria-hidden="true"></i> ATS Score Breakdown</div>
+              <div class="card-body-premium"><div class="chart-container"><canvas id="atsBreakdownChart" aria-label="ATS breakdown chart"></canvas></div></div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Resume Preview + Summary -->
+        <div class="row g-4 mb-4 section-block">
+          <div class="col-lg-5">
+            <div class="card-premium h-100">
+              <div class="card-header-premium"><i class="bi bi-file-person" aria-hidden="true"></i> Resume Preview</div>
+              <div class="card-body-premium p-0">
+                <div class="resume-preview" id="resumePreview">
+                  <div class="resume-preview-toolbar" aria-hidden="true">
+                    <span class="preview-dot red"></span><span class="preview-dot yellow"></span><span class="preview-dot green"></span>
+                  </div>
+                  <div class="resume-preview-body" id="resumePreviewBody">
+                    <p class="text-secondary-custom small mb-0">Upload and analyze a resume to see the preview.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-7">
+            <div class="card-premium h-100">
+              <div class="card-header-premium"><i class="bi bi-file-text" aria-hidden="true"></i> AI Resume Summary</div>
+              <div class="card-body-premium">
+                <div class="summary-card">
+                  <p class="summary-text" id="resumeSummary">Your AI-generated resume summary will appear here after analysis.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Matched Skills -->
+        <div class="row g-4 mb-4 section-block">
+          <div class="col-12">
+            <div class="card-premium">
+              <div class="card-header-premium">
+                <i class="bi bi-check-circle text-success" aria-hidden="true"></i> Matched Skills
+                <span class="badge bg-success-subtle text-success ms-auto" id="matchedBadge">0 Found</span>
+              </div>
+              <div class="card-body-premium"><div class="skill-badges" id="matchedSkills" role="list"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Missing Skills -->
+        <div class="row g-4 mb-4 section-block">
+          <div class="col-12">
+            <div class="card-premium">
+              <div class="card-header-premium">
+                <i class="bi bi-x-circle text-danger" aria-hidden="true"></i> Missing Skills
+                <span class="badge bg-danger-subtle text-danger ms-auto" id="missingBadge">0 Gaps</span>
+              </div>
+              <div class="card-body-premium">
+                <p class="small text-secondary-custom mb-3"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Highlighted skills are critical keywords from the job description.</p>
+                <div class="skill-badges" id="missingSkills" role="list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strengths & Weaknesses -->
+        <div class="row g-4 mb-4 section-block">
+          <div class="col-lg-6">
+            <div class="card-premium h-100">
+              <div class="card-header-premium"><i class="bi bi-hand-thumbs-up text-success" aria-hidden="true"></i> Strengths</div>
+              <div class="card-body-premium"><div class="row g-3" id="strengthsList"></div></div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card-premium h-100">
+              <div class="card-header-premium"><i class="bi bi-exclamation-triangle text-warning" aria-hidden="true"></i> Weaknesses</div>
+              <div class="card-body-premium"><div class="row g-3" id="weaknessesList"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommended Improvements -->
+        <div class="row g-4 mb-4 section-block">
+          <div class="col-12">
+            <div class="card-premium">
+              <div class="card-header-premium"><i class="bi bi-lightbulb" aria-hidden="true"></i> Recommended Improvements</div>
+              <div class="card-body-premium"><div class="row g-3" id="aiSuggestions"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Keyword Table -->
+        <div class="row g-4 section-block" id="printableReport">
+          <div class="col-12">
+            <div class="card-premium">
+              <div class="card-header-premium"><i class="bi bi-table" aria-hidden="true"></i> Keyword Density Analysis</div>
+              <div class="card-body-premium p-0">
+                <div class="table-responsive">
+                  <table class="table table-premium mb-0" aria-label="Keyword density analysis">
+                    <thead><tr><th scope="col">Keyword</th><th scope="col">Occurrences</th><th scope="col">Density</th><th scope="col">Status</th></tr></thead>
+                    <tbody id="keywordTableBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer-premium no-print">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="footer-brand"><i class="bi bi-file-earmark-person-fill" aria-hidden="true"></i> AI Resume Analyzer</div>
+          <p class="small mb-3">Enterprise-grade ATS analytics for modern job seekers. Beat automated screenings with AI-powered insights.</p>
+          <div class="footer-social d-flex gap-2">
+            <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+            <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" aria-label="GitHub"><i class="bi bi-github"></i></a>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="footer-heading">Product</h6>
+          <div class="footer-links">
+            <a th:href="@{/analyze}" href="/analyze">Analyze Resume</a>
+            <a th:href="@{/}" href="/">Home</a>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="footer-heading">Resources</h6>
+          <div class="footer-links">
+            <a href="#">Documentation</a>
+            <a href="#">ATS Guide</a>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <h6 class="footer-heading">Contact</h6>
+          <div class="footer-contact-item"><i class="bi bi-envelope" aria-hidden="true"></i> support@airesumeanalyzer.com</div>
+          <div class="footer-contact-item"><i class="bi bi-geo-alt" aria-hidden="true"></i> San Francisco, CA</div>
+        </div>
+      </div>
+      <div class="footer-bottom text-center">&copy; 2026 AI Resume Analyzer. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
+  <script th:src="@{/js/script.js(v='2.0.2')}" src="/js/script.js?v=2.0.2"></script>
+</body>
+</html>
