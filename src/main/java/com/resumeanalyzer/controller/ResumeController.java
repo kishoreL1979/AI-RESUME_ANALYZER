@@ -10,7 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +27,7 @@ import com.resumeanalyzer.service.ResumeService;
 import com.resumeanalyzer.service.ResumeValidationService;
 import com.resumeanalyzer.service.SkillMatchingService;
 import com.resumeanalyzer.service.ResumeSectionParser;
+import com.resumeanalyzer.service.PdfGenerationService;
 import com.resumeanalyzer.util.FileValidationUtil;
 
 @RestController
@@ -36,18 +39,21 @@ public class ResumeController {
     private final ATSService atsService;
     private final OpenRouterService openRouterService;
     private final ResumeValidationService resumeValidationService;
+    private final PdfGenerationService pdfGenerationService;
     private final ObjectMapper mapper = new ObjectMapper();
 
     private static final Logger log = LoggerFactory.getLogger(ResumeController.class);
 
     public ResumeController(ResumeService resumeService, SkillMatchingService skillMatchingService, 
                             ATSService atsService, OpenRouterService openRouterService,
-                            ResumeValidationService resumeValidationService) {
+                            ResumeValidationService resumeValidationService,
+                            PdfGenerationService pdfGenerationService) {
         this.resumeService = resumeService;
         this.skillMatchingService = skillMatchingService;
         this.atsService = atsService;
         this.openRouterService = openRouterService;
         this.resumeValidationService = resumeValidationService;
+        this.pdfGenerationService = pdfGenerationService;
     }
 
     @PostMapping(value = "/analyze", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -251,6 +257,16 @@ public class ResumeController {
 
         log.info("Analysis complete. ATS Score: {}", ats.getScore());
         return ResponseEntity.ok(resp);
+    }
+
+    @PostMapping(value = "/generate-pdf", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<byte[]> generatePdf(@RequestBody ResumeAnalysisResponse response) {
+        log.info("Request received to generate PDF report");
+        byte[] pdfBytes = pdfGenerationService.generatePdf(response);
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"resume-analysis-report.pdf\"")
+            .contentType(MediaType.APPLICATION_PDF)
+            .body(pdfBytes);
     }
 
     private List<String> getListFromMap(Map<String, Object> map, String key) {

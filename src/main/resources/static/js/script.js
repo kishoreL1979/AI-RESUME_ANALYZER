@@ -860,21 +860,48 @@
     const printBtn = $("#printReportBtn");
 
     if (pdfBtn) {
-      pdfBtn.addEventListener("click", () => {
-        if (!lastAnalysisData) return;
-        const element = $("#resultsSection");
-        if (typeof html2pdf === "undefined") {
-          showToast("PDF library loading. Please try again.", "warning");
+      pdfBtn.addEventListener("click", async () => {
+        if (!lastAnalysisData) {
+          showToast("No analysis data available to export.", "warning");
           return;
         }
-        showToast("Generating PDF report...", "info");
-        html2pdf().set({
-          margin: 10,
-          filename: "resume-analysis-report.pdf",
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        }).from(element).save().then(() => showToast("PDF downloaded successfully!", "success"));
+        
+        pdfBtn.disabled = true;
+        const originalText = pdfBtn.innerHTML;
+        pdfBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Generating...';
+        showToast("Generating PDF report on server...", "info");
+        
+        try {
+          const response = await fetch("/api/generate-pdf", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(lastAnalysisData)
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Server returned status ${response.status}`);
+          }
+          
+          const blob = await response.blob();
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = downloadUrl;
+          link.download = "resume-analysis-report.pdf";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+          
+          showToast("PDF downloaded successfully!", "success");
+        } catch (error) {
+          console.error("PDF download failed:", error);
+          showToast("Failed to download PDF report: " + error.message, "danger");
+        } finally {
+          pdfBtn.disabled = false;
+          pdfBtn.innerHTML = originalText;
+        }
       });
     }
 

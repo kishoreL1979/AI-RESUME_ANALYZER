@@ -91,6 +91,41 @@ public class AnalyzeIntegrationTest {
     }
 
     @Test
+    public void testGeneratePdfReport() throws Exception {
+        File pdf = createSamplePdf("Java developer with Spring Boot and AWS experience. 5 years experience.");
+
+        MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+        parts.add("file", new FileSystemResource(pdf));
+        parts.add("jobDescription", "Java Spring Boot AWS");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(parts, headers);
+
+        RestTemplate rest = new RestTemplate();
+        String analyzeUrl = "http://localhost:" + port + "/api/analyze";
+        ResponseEntity<ResumeAnalysisResponse> analyzeResp = rest.postForEntity(analyzeUrl, request, ResumeAnalysisResponse.class);
+        Assertions.assertEquals(HttpStatus.OK, analyzeResp.getStatusCode());
+        ResumeAnalysisResponse responseData = analyzeResp.getBody();
+        Assertions.assertNotNull(responseData);
+
+        // Call the PDF download endpoint
+        String pdfUrl = "http://localhost:" + port + "/api/generate-pdf";
+        HttpHeaders pdfHeaders = new HttpHeaders();
+        pdfHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<ResumeAnalysisResponse> pdfRequest = new HttpEntity<>(responseData, pdfHeaders);
+
+        ResponseEntity<byte[]> pdfResp = rest.postForEntity(pdfUrl, pdfRequest, byte[].class);
+        Assertions.assertEquals(HttpStatus.OK, pdfResp.getStatusCode());
+        Assertions.assertEquals(MediaType.APPLICATION_PDF, pdfResp.getHeaders().getContentType());
+        Assertions.assertNotNull(pdfResp.getBody());
+        Assertions.assertTrue(pdfResp.getBody().length > 0);
+
+        Files.deleteIfExists(pdf.toPath());
+    }
+
+    @Test
     public void testSkillMatchingAndAts() {
         String resume = "Java Spring Boot AWS Docker 6 years";
         String job = "Java Spring Boot AWS Kubernetes";
