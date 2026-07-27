@@ -1,0 +1,10 @@
+target/
+.git/
+.github/
+.idea/
+.vscode/
+*.iml
+.mvn/wrapper/maven-wrapper.jar
+mvnw.cmd
+HELP.md
+CLAUDE_HANDOFF_REPORT.md
